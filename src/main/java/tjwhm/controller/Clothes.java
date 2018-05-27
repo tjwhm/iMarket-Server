@@ -1,7 +1,6 @@
 package tjwhm.controller;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -22,13 +21,14 @@ import tjwhm.model.bean.ClothesBean;
 @XmlRootElement
 public class Clothes {
 
+    private final String ERROR = "unknown error";
     private ClothesModel clothesModel = new ClothesModel();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public BaseBean getClothesInfo(@PathParam("sid") String sid) throws SQLException {
         if (sid.equals("list")) {
-            return new BaseBean<>(-1, "", clothesModel.getOnSaleClothesInfo());
+            return new BaseBean<>(-1, "", clothesModel.getOnSaleClothesList());
         }
         ClothesBean clothesBean = clothesModel.getClothesInfo(sid);
         return new BaseBean<>(-1, "", clothesBean);
@@ -58,10 +58,13 @@ public class Clothes {
                                         @FormParam("suitable_crowd") String suitable_crowd,
                                         @FormParam("price") double price,
                                         @FormParam("in_stock") int in_stock,
-                                        @FormParam("price1") double price1) {
-        if (sid.equals("new")){
-
+                                        @FormParam("price1") double price1) throws SQLException {
+        if (sid.equals("new")) {
+            boolean isSuccess = clothesModel.addNewClothes(name, brand, color, size, suitable_crowd, price, in_stock, price1);
+            if (isSuccess) {
+                return new BaseBean<>(-1, "success", null);
+            }
         }
-        return new BaseBean<>(-1, "", false);
+        return new BaseBean<>(500, ERROR, null);
     }
 }

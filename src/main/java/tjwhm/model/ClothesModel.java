@@ -82,7 +82,7 @@ public class ClothesModel {
 
     }
 
-    public List<ClothesBean> getOnSaleClothesInfo() throws SQLException {
+    public List<ClothesBean> getOnSaleClothesList() throws SQLException {
         String sql = "select * from clothes where on_sale=true;";
         ResultSet result = statement.executeQuery(sql);
         List<ClothesBean> list = new ArrayList<>();
@@ -117,7 +117,7 @@ public class ClothesModel {
         return true;
     }
 
-    public List getSID(String name, String brand) throws SQLException {
+    List<Integer> getSID(String name, String brand) throws SQLException {
         String sql = "select sid from clothes where name like \"%" +
                 name + "%\" and brand like \"%" + brand + "%\";";
         ResultSet resultSet = statement.executeQuery(sql);
@@ -128,16 +128,37 @@ public class ClothesModel {
         return res;
     }
 
-    public List getSID(String name, String brand, String color, String size, String suitable_crowd) throws SQLException {
+    List<Integer> getSID(String name, String brand, String color, String size, String suitable_crowd) throws SQLException {
         String sql = "select sid from clothes where name like \"%" +
                 name + "%\" and brand like \"%" + brand + "%\"" +
                 "and color like \"%" + color + "%\" and size like \"%" +
                 size + "%\" and suitable_crowd like \"%" + suitable_crowd + "%\";";
         ResultSet resultSet = statement.executeQuery(sql);
-        List res = new ArrayList();
+        List<Integer> res = new ArrayList<>();
         while (resultSet.next()) {
             res.add(resultSet.getInt("sid"));
         }
         return res;
+    }
+
+    public Boolean addNewClothes(String name, String brand, String color, String size, String suitable_crowd, double price, int in_stock, double price1) throws SQLException {
+        String sql = "select count(sid) as count from clothes;";
+        ResultSet resultSet = statement.executeQuery(sql);
+        int count = -1;
+        while (resultSet.next()) {
+            count = resultSet.getInt("count");
+        }
+        String insert = "insert into clothes values (" + String.valueOf(count) +
+                ", \"" + name + "\", \"" + brand + "\", \"" + color + "\", \"" + size + "\", \"" + suitable_crowd + "\", "
+                + String.valueOf(price) + ", " + String.valueOf(in_stock) + ", " + String.valueOf(price1) + ", true);";
+
+        statement.execute(insert);
+        int newCount = -1;
+        ResultSet countSet = statement.executeQuery(sql);
+        while (countSet.next()) {
+            newCount = countSet.getInt("count");
+        }
+        return newCount == count + 1;
+
     }
 }

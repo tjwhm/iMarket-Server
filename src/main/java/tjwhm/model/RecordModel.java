@@ -11,14 +11,15 @@ public class RecordModel extends BaseModel {
     ClothesModel clothesModel = new ClothesModel();
 
     public List<RecordBean> getRecord(String after, String before, String name, String brand, double low, double high) throws SQLException {
-        if (after == null) after = "1970-01-01 00:00:00";
-        if (before == null) before = "2100-01-01 00:00:00";
+        if (after == null || after.isEmpty()) after = "1970-01-01 00:00:00";
+        if (before == null || before.isEmpty()) before = "2100-01-01 00:00:00";
         if (name == null) name = "";
         if (brand == null) brand = "";
         if (high == 0.0) high = 9999.0;
-        List sids = clothesModel.getSID(name, brand);
+        List<Integer> sids = clothesModel.getSID(name, brand);
+        sids.add(-1);
         StringBuilder sidString = new StringBuilder("(");
-        sids.stream().forEach(it -> sidString.append(String.valueOf(it)).append(","));
+        sids.forEach(it -> sidString.append(String.valueOf(it)).append(","));
         sidString.deleteCharAt(sidString.length() - 1);
         sidString.append(")");
         // TODO: 2018/5/21 add food's sids
@@ -29,8 +30,8 @@ public class RecordModel extends BaseModel {
         return getRecordsFromResultSet(resultSet);
     }
 
-    public List<RecordBean> getRecord(String after, String before, String name, String brand, double low, double high,
-                                      String color, String size, String suitable_crowd) throws SQLException {
+    public List<RecordBean> getRecordForClothes(String after, String before, String name, String brand, double low, double high,
+                                                String color, String size, String suitable_crowd) throws SQLException {
         if (after == null) after = "1970-01-01 00:00:00";
         if (before == null) before = "2100-01-01 00:00:00";
         if (name == null) name = "";
@@ -54,14 +55,15 @@ public class RecordModel extends BaseModel {
         return getRecordsFromResultSet(resultSet);
     }
 
-    public List<RecordBean> getRecord(String after, String before, String name, String brand, double low, double high,
-                                      String shelf_life, String origin) {
+    public List<RecordBean> getRecordForFood(String after, String before, String name, String brand, double low, double high,
+                                             String shelf_life_from, String shelf_life_to, String origin) {
         if (after == null) after = "1970-01-01 00:00:00";
         if (before == null) before = "2100-01-01 00:00:00";
         if (name == null) name = "";
         if (brand == null) brand = "";
         if (high == 0.0) high = 9999.0;
-        if (shelf_life == null) shelf_life = "";
+        if (shelf_life_from == null) shelf_life_from = "";
+        if (shelf_life_to == null) shelf_life_to = "";
         if (origin == null) origin = "";
 
         return null;

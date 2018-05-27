@@ -10,9 +10,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import tjwhm.model.RecordModel;
 import tjwhm.model.bean.BaseBean;
 import tjwhm.model.bean.RecordBean;
-import tjwhm.model.RecordModel;
 
 @Path("/record")
 public class Record {
@@ -34,15 +34,29 @@ public class Record {
                                                  @QueryParam("suitable_crowd") String suitable_crowd,
                                                  @QueryParam("low") double low,
                                                  @QueryParam("high") double high,
-                                                 @QueryParam("shelf_life") String shelf_life,
+                                                 @QueryParam("shelf_life_from") String shelf_life_from,
+                                                 @QueryParam("shelf_life_to") String shelf_life_to,
                                                  @QueryParam("origin") String origin) throws SQLException {
         List<RecordBean> list = new ArrayList<>();
+        System.out.println("after:" + after);
+        System.out.println("before:" + before);
+        System.out.println("type:" + String.valueOf(type));
+        System.out.println("name:" + name);
+        System.out.println("brand:" + brand);
+        System.out.println("color:" + color);
+        System.out.println("size:" + size);
+        System.out.println("suitable_crowd" + suitable_crowd);
+        System.out.println("low:" + String.valueOf(low));
+        System.out.println("high" + String.valueOf(high));
+        System.out.println("shelf_life_from:" + shelf_life_from);
+        System.out.println("shelf_life_from:" + shelf_life_to);
+        System.out.println("origin:" + origin);
         if (type == TYPE_ALL) {
             list = recordModel.getRecord(after, before, name, brand, low, high);
         } else if (type == TYPE_CLOTHES) {
-            list = recordModel.getRecord(after, before, name, brand, low, high, color, size, suitable_crowd);
+            list = recordModel.getRecordForClothes(after, before, name, brand, low, high, color, size, suitable_crowd);
         } else if (type == TYPE_FOOD) {
-            list = recordModel.getRecord(after, before, name, brand, low, high, shelf_life, origin);
+            list = recordModel.getRecordForFood(after, before, name, brand, low, high, shelf_life_from, shelf_life_to, origin);
         }
 
         return new BaseBean<>(-1, "", list);
