@@ -24,6 +24,7 @@ public class ClothesModel {
             clothesBean.suitable_crowd = result.getString("suitable_crowd");
             clothesBean.price = result.getDouble("price");
             clothesBean.in_stock = result.getInt("in_stock");
+            clothesBean.price1 = result.getDouble("price1");
             clothesBean.on_sale = result.getBoolean("on_sale");
         }
         return clothesBean;
@@ -43,8 +44,7 @@ public class ClothesModel {
         ResultSet temp = statement
                 .executeQuery("select in_stock from clothes where sid=" + sid + ";");
         temp.next();
-        StringBuilder stringBuilder = new StringBuilder("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat sdf = new SimpleDateFormat(stringBuilder.toString());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = sdf.format(new Date());
         System.out.println(date);
 
@@ -65,7 +65,7 @@ public class ClothesModel {
                 return true;
             } else {
                 ResultSet temp1 = statement
-                        .executeQuery("select price from clothes where sid=" + sid + ";");
+                        .executeQuery("select price1 from clothes where sid=" + sid + ";");
                 temp1.next();
                 double price1 = temp1.getDouble("price1");
                 statement.execute("insert into record values (\""
@@ -86,6 +86,19 @@ public class ClothesModel {
         String sql = "select * from clothes where on_sale=true;";
         ResultSet result = statement.executeQuery(sql);
         List<ClothesBean> list = new ArrayList<>();
+        getListFromResultSet(result, list);
+        return list;
+    }
+
+    public List<ClothesBean> getAllClothesList() throws SQLException {
+        String sql = "select * from clothes;";
+        ResultSet result = statement.executeQuery(sql);
+        List<ClothesBean> list = new ArrayList<>();
+        getListFromResultSet(result, list);
+        return list;
+    }
+
+    private void getListFromResultSet(ResultSet result, List<ClothesBean> list) throws SQLException {
         while (result.next()) {
             ClothesBean clothesBean = new ClothesBean();
             clothesBean.sid = result.getInt("sid");
@@ -96,23 +109,20 @@ public class ClothesModel {
             clothesBean.suitable_crowd = result.getString("suitable_crowd");
             clothesBean.price = result.getDouble("price");
             clothesBean.in_stock = result.getInt("in_stock");
+            clothesBean.price1 = result.getDouble("price1");
             clothesBean.on_sale = result.getBoolean("on_sale");
             list.add(clothesBean);
         }
-        return list;
     }
 
-    public Boolean changeOnSaleStatus(String sid, boolean on_sale) throws SQLException {
+    public Boolean changeOnSaleStatus(String sid) throws SQLException {
         String sql = "select on_sale from clothes where sid=" + sid + ";";
         ResultSet resultSet = statement.executeQuery(sql);
         boolean formalStatus = true;
         while (resultSet.next()) {
             formalStatus = resultSet.getBoolean("on_sale");
         }
-        if (formalStatus == on_sale) {
-            return false;
-        }
-        sql = "update clothes set on_sale =" + String.valueOf(on_sale) + " where sid=" + sid + ";";
+        sql = "update clothes set on_sale =" + String.valueOf(!formalStatus) + " where sid=" + sid + ";";
         statement.execute(sql);
         return true;
     }

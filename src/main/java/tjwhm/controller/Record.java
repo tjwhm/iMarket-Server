@@ -45,7 +45,7 @@ public class Record {
         System.out.println("brand:" + brand);
         System.out.println("color:" + color);
         System.out.println("size:" + size);
-        System.out.println("suitable_crowd" + suitable_crowd);
+        System.out.println("suitable_crowd:" + suitable_crowd);
         System.out.println("low:" + String.valueOf(low));
         System.out.println("high" + String.valueOf(high));
         System.out.println("shelf_life_from:" + shelf_life_from);

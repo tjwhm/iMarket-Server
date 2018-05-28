@@ -4,7 +4,9 @@ package tjwhm.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import tjwhm.model.bean.FoodBean;
@@ -15,6 +17,19 @@ public class FoodModel extends BaseModel {
         String sql = "select * from food where on_sale is true;";
         ResultSet resultSet = statement.executeQuery(sql);
         List<FoodBean> list = new ArrayList<>();
+        getListFromResultSet(resultSet, list);
+        return list;
+    }
+
+    public List<FoodBean> getAllFoodList() throws SQLException {
+        String sql = "select * from food;";
+        ResultSet resultSet = statement.executeQuery(sql);
+        List<FoodBean> list = new ArrayList<>();
+        getListFromResultSet(resultSet, list);
+        return list;
+    }
+
+    private void getListFromResultSet(ResultSet resultSet, List<FoodBean> list) throws SQLException {
         while (resultSet.next()) {
             FoodBean foodBean = new FoodBean();
             foodBean.sid = resultSet.getInt("sid");
@@ -28,7 +43,6 @@ public class FoodModel extends BaseModel {
             foodBean.on_sale = resultSet.getBoolean("on_sale");
             list.add(foodBean);
         }
-        return list;
     }
 
     public FoodBean getFoodInfo(String sid) throws SQLException {
@@ -70,6 +84,39 @@ public class FoodModel extends BaseModel {
         return judge == count + 1;
     }
 
+    public boolean updateFoodStock(String sid, int change) throws SQLException {
+        String select = "select * from food where sid = " + sid + ";";
+        ResultSet stockRes = statement.executeQuery(select);
+        int stock = 0;
+        double price = 0;
+        double price1 = 0;
+        while (stockRes.next()) {
+            stock = stockRes.getInt("in_stock");
+            price = stockRes.getDouble("price");
+            price1 = stockRes.getDouble("price1");
+        }
+
+        String sql = "update food set in_stock = " + String.valueOf(stock + change)
+                + " where sid = " + sid + ";";
+        statement.execute(sql);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = sdf.format(new Date());
+        System.out.println(date);
+        if (change < 0) {
+            String insert = "insert into record values (\"" + date
+                    + "\"," + sid + "," + String.valueOf(0 - change)
+                    + "," + String.valueOf(price) + "," + String.valueOf(price * (0 - change)) + ",\"sell\");";
+            statement.execute(insert);
+        } else {
+            String insert = "insert into record values (\"" + date
+                    + "\"," + sid + "," + String.valueOf(change)
+                    + "," + String.valueOf(price1) + "," + String.valueOf(price1 * change) + ",\"purchase\");";
+            statement.execute(insert);
+        }
+        return true;
+    }
+
     public boolean changeFoodOnSaleStatus(String sid) throws SQLException {
         String sql = "select on_sale from food where sid = " + sid + ";";
         ResultSet statusRes = statement.executeQuery(sql);
@@ -84,6 +131,34 @@ public class FoodModel extends BaseModel {
         while (newStatusSet.next()) {
             judged = newStatusSet.getBoolean("on_sale");
         }
-        return judged == status;
+        return judged != status;
     }
+
+    public List<Integer> getSID(String name, String brand, String shelf_life_from, String shelf_life_to,
+                                String origin, double low, double high) throws SQLException {
+        String select = "select sid from food where name like \"%" + name
+                + "%\" and brand like \"%" + brand + "%\" and shelf_life > \"" + shelf_life_from +
+                "\" and shelf_life < \"" + shelf_life_to + "\" and origin like \"%" + origin +
+                "%\" and price >" + low + " and price < " + high + ";";
+
+        ResultSet resultSet = statement.executeQuery(select);
+        List<Integer> list = new ArrayList<>();
+        while (resultSet.next()) {
+            list.add(resultSet.getInt("sid"));
+        }
+
+        return list;
+    }
+
+    public List<Integer> getSID(String name, String brand) throws SQLException {
+        String select = "select sid from food where name like \"%" + name
+                + "%\" and brand like \"%" + brand + "%\";";
+        ResultSet resultSet = statement.executeQuery(select);
+        List<Integer> list = new ArrayList<>();
+        while (resultSet.next()) {
+            list.add(resultSet.getInt("sid"));
+        }
+        return list;
+    }
+
 }

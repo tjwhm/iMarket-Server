@@ -29,6 +29,8 @@ public class Clothes {
     public BaseBean getClothesInfo(@PathParam("sid") String sid) throws SQLException {
         if (sid.equals("list")) {
             return new BaseBean<>(-1, "", clothesModel.getOnSaleClothesList());
+        } else if (sid.equals("all")) {
+            return new BaseBean<>(-1, "", clothesModel.getAllClothesList());
         }
         ClothesBean clothesBean = clothesModel.getClothesInfo(sid);
         return new BaseBean<>(-1, "", clothesBean);
@@ -36,15 +38,15 @@ public class Clothes {
 
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public BaseBean<Boolean> updateClothesInfo(@PathParam("sid") String sid, @FormParam("change") int change) throws SQLException {
+    public BaseBean<Boolean> updateClothesStock(@PathParam("sid") String sid, @FormParam("change") int change) throws SQLException {
         Boolean success = clothesModel.updateClothesInfo(sid, change);
         return new BaseBean<>(-1, "", success);
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public BaseBean<Boolean> changeClothesOnSaleStatus(@PathParam("sid") String sid, @FormParam("on_sale") boolean on_sale) throws SQLException {
-        Boolean success = clothesModel.changeOnSaleStatus(sid, on_sale);
+    public BaseBean<Boolean> changeClothesOnSaleStatus(@PathParam("sid") String sid) throws SQLException {
+        Boolean success = clothesModel.changeOnSaleStatus(sid);
         return new BaseBean<>(-1, "", success);
     }
 

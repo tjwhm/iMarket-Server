@@ -2,12 +2,14 @@ package tjwhm.controller;
 
 // Created by tjwhm at 2018/5/27 9:59 PM
 
+
 import java.sql.SQLException;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -29,8 +31,16 @@ public class Food {
     public BaseBean getFoodInfo(@PathParam("sid") String sid) throws SQLException {
         if (sid.equals("list")) {
             return new BaseBean<>(-1, "", foodModel.getOnSaleFoodList());
+        } else if (sid.equals("all")) {
+            return new BaseBean<>(-1, "", foodModel.getAllFoodList());
         }
         return new BaseBean<>(-1, "", foodModel.getFoodInfo(sid));
+    }
+
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public BaseBean<Boolean> updateFoodStock(@PathParam("sid") String sid, @FormParam("change") int change) throws SQLException {
+        return new BaseBean<>(-1, "", foodModel.updateFoodStock(sid, change));
     }
 
     @POST
@@ -61,4 +71,6 @@ public class Food {
         }
         return new BaseBean<>(500, ERROR, null);
     }
+
+
 }

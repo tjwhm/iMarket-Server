@@ -9,5 +9,6 @@ public class ClothesBean {
     public String suitable_crowd;
     public double price;
     public int in_stock;
+    public double price1;
     public boolean on_sale;
 }
