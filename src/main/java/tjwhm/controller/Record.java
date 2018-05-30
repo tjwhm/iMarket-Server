@@ -1,5 +1,6 @@
 package tjwhm.controller;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,5 +68,21 @@ public class Record {
     @Produces(MediaType.APPLICATION_JSON)
     public BaseBean<List<RecordBean>> getAllRecords() throws SQLException {
         return new BaseBean<>(-1, "", recordModel.getAllRecords());
+    }
+
+    @Path("/export")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public BaseBean<Boolean> exportRecords(@QueryParam("type") String type,
+                                           @QueryParam("from") String from,
+                                           @QueryParam("to") String to) throws IOException, SQLException {
+        if (type.equals("all")) {
+            return new BaseBean<>(-1, "", recordModel.exportAllRecords(from, to));
+        } else if (type.equals("sell")) {
+            return new BaseBean<>(-1, "", recordModel.exportSellRecords(from, to));
+        } else if (type.equals("purchase")) {
+            return new BaseBean<>(-1, "", recordModel.exportPurchaseRecords(from, to));
+        }
+        return new BaseBean<>(404, "no such api!", null);
     }
 }

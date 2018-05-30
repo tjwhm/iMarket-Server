@@ -90,10 +90,12 @@ public class FoodModel extends BaseModel {
         int stock = 0;
         double price = 0;
         double price1 = 0;
+        String brand = "";
         while (stockRes.next()) {
             stock = stockRes.getInt("in_stock");
             price = stockRes.getDouble("price");
             price1 = stockRes.getDouble("price1");
+            brand = stockRes.getString("brand");
         }
 
         String sql = "update food set in_stock = " + String.valueOf(stock + change)
@@ -105,12 +107,12 @@ public class FoodModel extends BaseModel {
         System.out.println(date);
         if (change < 0) {
             String insert = "insert into record values (\"" + date
-                    + "\"," + sid + "," + String.valueOf(0 - change)
+                    + "\"," + sid + ",\"" + brand + "\"," + String.valueOf(0 - change)
                     + "," + String.valueOf(price) + "," + String.valueOf(price * (0 - change)) + ",\"sell\");";
             statement.execute(insert);
         } else {
             String insert = "insert into record values (\"" + date
-                    + "\"," + sid + "," + String.valueOf(change)
+                    + "\"," + sid + ",\"" + brand + "\"," + String.valueOf(change)
                     + "," + String.valueOf(price1) + "," + String.valueOf(price1 * change) + ",\"purchase\");";
             statement.execute(insert);
         }
@@ -158,6 +160,48 @@ public class FoodModel extends BaseModel {
         while (resultSet.next()) {
             list.add(resultSet.getInt("sid"));
         }
+        return list;
+    }
+
+    public List<FoodBean> getFitFood(String name, String brand, String life_from, String life_to,
+                                     String origin, double price_from,
+                                     double price_to, int stock_from, int stock_to,
+                                     double price1_from, double price1_to, String on_sale) throws SQLException {
+        if (name == null) name = "";
+        if (brand == null) brand = "";
+        if (life_from == null || life_from.isEmpty()) life_from = "1999-09-09 09:09:09";
+        if (life_to == null || life_to.isEmpty()) life_to = "2100-09-09 09:09:09";
+        if (origin == null) origin = "";
+        if (price_to == 0) price_to = 9999.9;
+        if (price1_to == 0) price1_to = 9999.9;
+        if (stock_to == 0) stock_to = 999;
+        if (on_sale == null) on_sale = "";
+
+        String select = "select * from food where name like \"%" + name
+                + "%\" and brand like \"%" + brand +
+                "%\" and shelf_life > \"" + life_from +
+                "\" and shelf_life < \"" + life_to + "\" and origin like \"%" +
+                origin + "%\" and price > " + price_from
+                + " and price <" + price_to + " and in_stock > " + stock_from
+                + " and in_stock < " + stock_to
+                + " and price1>" + price1_from + " and price1<" + price1_to + " and on_sale " +
+                "like \"%" + on_sale + "%\";";
+
+        ResultSet resultSet = statement.executeQuery(select);
+        List<FoodBean> list = new ArrayList<>();
+        while (resultSet.next()) {
+            FoodBean foodBean = new FoodBean();
+            foodBean.name = resultSet.getString("name");
+            foodBean.brand = resultSet.getString("brand");
+            foodBean.shelf_life = resultSet.getString("shelf_life");
+            foodBean.origin = resultSet.getString("origin");
+            foodBean.price = resultSet.getDouble("price");
+            foodBean.in_stock = resultSet.getInt("in_stock");
+            foodBean.price1 = resultSet.getDouble("price1");
+            foodBean.on_sale = resultSet.getBoolean("on_sale");
+            list.add(foodBean);
+        }
+
         return list;
     }
 

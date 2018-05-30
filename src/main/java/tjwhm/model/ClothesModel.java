@@ -1,5 +1,6 @@
 package tjwhm.model;
 
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -45,19 +46,23 @@ public class ClothesModel {
                 .executeQuery("select in_stock from clothes where sid=" + sid + ";");
         temp.next();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String date = sdf.format(new Date());
+        long currentMills = System.currentTimeMillis() - 13L * 3600L * 1000L;
+        Date current = new Date(currentMills);
+        String date = sdf.format(current);
         System.out.println(date);
 
         if (afterChange == temp.getInt("in_stock")) {
             if (change < 0) {
 
                 ResultSet temp1 = statement
-                        .executeQuery("select price from clothes where sid=" + sid + ";");
+                        .executeQuery("select * from clothes where sid=" + sid + ";");
                 temp1.next();
+                String brand = temp1.getString("brand");
                 double price = temp1.getDouble("price");
                 statement.execute("insert into record values (\""
                         + date + " \" ,"
-                        + sid + ","
+                        + sid + ",\""
+                        + brand + "\","
                         + String.valueOf(0 - change) + ","
                         + String.valueOf(price) + ","
                         + String.valueOf(price * (0 - change)) + ","
@@ -65,12 +70,14 @@ public class ClothesModel {
                 return true;
             } else {
                 ResultSet temp1 = statement
-                        .executeQuery("select price1 from clothes where sid=" + sid + ";");
+                        .executeQuery("select * from clothes where sid=" + sid + ";");
                 temp1.next();
                 double price1 = temp1.getDouble("price1");
+                String brand = temp1.getString("brand");
                 statement.execute("insert into record values (\""
                         + date + "\","
-                        + sid + ","
+                        + sid + ",\""
+                        + brand + "\","
                         + String.valueOf(change) + ","
                         + String.valueOf(price1) + ","
                         + String.valueOf(price1 * change) + ","
@@ -170,5 +177,49 @@ public class ClothesModel {
         }
         return newCount == count + 1;
 
+    }
+
+    public List<ClothesBean> getFitClothes(String name, String brand, String color,
+                                           String size, String gender, double price_from,
+                                           double price_to, int stock_from, int stock_to,
+                                           double price1_from, double price1_to, String on_sale) throws SQLException {
+
+
+        if (name == null) name = "";
+        if (brand == null) brand = "";
+        if (color == null) color = "";
+        if (size == null) size = "";
+        if (gender == null) gender = "";
+        if (price_to == 0) price_to = 9999.9;
+        if (price1_to == 0) price1_to = 9999.9;
+        if (stock_to == 0) stock_to = 999;
+        if (on_sale == null) on_sale = "";
+
+
+        String select = "select * from clothes where name like \"%" + name
+                + "%\" and brand like \"%" + brand + "%\" and color like \"%" + color +
+                "%\" and size like \"%" + size + "%\" and suitable_crowd like \"%" + gender +
+                "%\" and price > " + price_from + " and price < " + price_to
+                + " and in_stock > " + stock_from + " and in_stock < " + stock_to +
+                " and price1 > " + price1_from + " and price1 <" + price1_to
+                + " and on_sale like \"%" + on_sale + "%\";";
+        ResultSet resultSet = statement.executeQuery(select);
+
+        List<ClothesBean> list = new ArrayList<>();
+        while (resultSet.next()) {
+            ClothesBean clothesBean = new ClothesBean();
+            clothesBean.name = resultSet.getString("name");
+            clothesBean.brand = resultSet.getString("brand");
+            clothesBean.color = resultSet.getString("color");
+            clothesBean.size = resultSet.getString("size");
+            clothesBean.suitable_crowd = resultSet.getString("suitable_crowd");
+            clothesBean.price = resultSet.getDouble("price");
+            clothesBean.in_stock = resultSet.getInt("in_stock");
+            clothesBean.price1 = resultSet.getDouble("price1");
+            clothesBean.on_sale = resultSet.getBoolean("on_sale");
+            list.add(clothesBean);
+        }
+
+        return list;
     }
 }

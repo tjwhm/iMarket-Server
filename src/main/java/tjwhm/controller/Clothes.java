@@ -69,4 +69,5 @@ public class Clothes {
         }
         return new BaseBean<>(500, ERROR, null);
     }
+
 }

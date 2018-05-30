@@ -35,6 +35,10 @@
           <element id="library" level="project" name="Maven: org.javassist:javassist:3.18.1-GA" />
           <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:2.6.0" />
           <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.11" />
+          <element id="file-copy" path="$USER_HOME$/Downloads/poi-3.17/lib/commons-codec-1.10.jar" />
+          <element id="file-copy" path="$USER_HOME$/Downloads/poi-3.17/lib/commons-collections4-4.1.jar" />
+          <element id="file-copy" path="$USER_HOME$/Downloads/poi-3.17/lib/commons-logging-1.2.jar" />
+          <element id="file-copy" path="$USER_HOME$/Downloads/poi-3.17/poi-3.17.jar" />
         </element>
       </element>
     </root>
